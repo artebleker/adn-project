@@ -5,6 +5,7 @@ const publicacionSchema = new mongoose.Schema({
   descripcion: String,
   imagen: String,
   comentarios: [{ contenido: String }],
+  fechaCreacion: Date,
 });
 
 export default mongoose.model("Publicacion", publicacionSchema);

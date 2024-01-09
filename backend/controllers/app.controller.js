@@ -22,7 +22,14 @@ export const getAllPublicaciones = async (req, res) => {
 
 export const createPublicacion = async (req, res) => {
   try {
-    const nuevaPublicacion = new Publicacion(req.body);
+    const { titulo, descripcion, imagen, comentarios = [{}] } = req.body;
+    const nuevaPublicacion = new Publicacion({
+      titulo,
+      descripcion,
+      imagen,
+      comentarios,
+      fechaCreacion: new Date(),
+    });
     await nuevaPublicacion.save();
     res.json(nuevaPublicacion);
   } catch (err) {
