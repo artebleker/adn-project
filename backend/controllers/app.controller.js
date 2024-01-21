@@ -1,4 +1,4 @@
-import Publicacion from "../model/schema.js";
+import Post from "../model/postSchema.js";
 
 const handleError = (res, err) => {
   console.error(`Error: ${err}`);
@@ -11,24 +11,23 @@ const handleNotFound = (res, resource) => {
   }
 };
 
-export const getAllPublicaciones = async (req, res) => {
+export const getAllPost = async (req, res) => {
   try {
-    const publicaciones = await Publicacion.find();
+    const publicaciones = await Post.find();
     res.json(publicaciones);
   } catch (err) {
     handleError(res, err);
   }
 };
 
-export const createPublicacion = async (req, res) => {
+export const createPost = async (req, res) => {
   try {
-    const { titulo, descripcion, imagen, comentarios = [{}] } = req.body;
-    const nuevaPublicacion = new Publicacion({
-      titulo,
-      descripcion,
-      imagen,
-      comentarios,
-      fechaCreacion: new Date(),
+    const { title, description, image, author = [{}] } = req.body;
+    const nuevaPublicacion = new Post({
+      title,
+      description,
+      image,
+      author,
     });
     await nuevaPublicacion.save();
     res.json(nuevaPublicacion);
@@ -37,9 +36,9 @@ export const createPublicacion = async (req, res) => {
   }
 };
 
-export const getPublicacionById = async (req, res) => {
+export const getPostById = async (req, res) => {
   try {
-    const publicacion = await Publicacion.findById(req.params.id);
+    const publicacion = await Post.findById(req.params.id);
     handleNotFound(res, publicacion);
     res.json(publicacion);
   } catch (err) {
@@ -47,13 +46,11 @@ export const getPublicacionById = async (req, res) => {
   }
 };
 
-export const updatePublicacion = async (req, res) => {
+export const updatePost = async (req, res) => {
   try {
-    const publicacion = await Publicacion.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    const publicacion = await Post.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
     handleNotFound(res, publicacion);
     res.json(publicacion);
   } catch (err) {
@@ -61,12 +58,10 @@ export const updatePublicacion = async (req, res) => {
   }
 };
 
-export const deletePublicacion = async (req, res) => {
+export const deletePost = async (req, res) => {
   try {
-    const deletedPublicacion = await Publicacion.findByIdAndDelete(
-      req.params.id
-    );
-    handleNotFound(res, deletedPublicacion);
+    const deletedPost = await Post.findByIdAndDelete(req.params.id);
+    handleNotFound(res, deletedPost);
     res.json({ mensaje: "Publicación eliminada exitosamente" });
   } catch (err) {
     handleError(res, err);

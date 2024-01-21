@@ -1,14 +1,11 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-import { env } from "./config.js";
 import router from "../routes/app.routes.js";
 
 const app = express();
 
 mongoose.connect("mongodb://127.0.0.1:27017/adn-project");
-// mongoose.connect(`${env.DB_LOCATION + env.DB_NAME}`);
-
 const db = mongoose.connection;
 
 db.on("error", (err) => {
