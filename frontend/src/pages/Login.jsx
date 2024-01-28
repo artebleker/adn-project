@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 const Login = () => {
   const navigate = useNavigate();
 
@@ -7,22 +8,67 @@ const Login = () => {
   const [contrasena, setContrasena] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (usuario === "admin" && contrasena === "1234") {
-      localStorage.setItem("login", "TRUE");
-      navigate("/");
-    } else {
-      setError("Credenciales incorrectas");
+    try {
+      const response = await fetch("http://localhost:5000/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: usuario,
+          password: contrasena,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("author", usuario);
+        navigate("/");
+      } else {
+        setError("Credenciales incorrectas");
+      }
+    } catch (error) {
+      console.error("Error al realizar la solicitud:", error);
+      setError("Error en el servidor");
     }
   };
-  const token = localStorage.getItem("login");
-  useEffect(() => {
-    if (token === "TRUE") {
-      window.location.href = "/";
+
+  const handleSignup = async () => {
+    if (usuario === "" || contrasena === "") return;
+    try {
+      const response = await fetch("http://localhost:5000/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: usuario,
+          password: contrasena,
+        }),
+      });
+
+      if (response.ok) {
+        console.log("Usuario creado exitosamente");
+      } else {
+        const data = await response.json();
+        setError(data.error || "Error en el servidor");
+      }
+    } catch (error) {
+      console.error("Error al realizar la solicitud:", error);
+      setError("Error en el servidor");
     }
-  }, []);
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/");
+    }
+  }, [navigate]);
 
   return (
     <div className="container">
@@ -62,10 +108,12 @@ const Login = () => {
               Iniciar Sesión
             </button>
           </form>
-        </div>
-        <div className="text-center mt-2 p-2">
-          <p>Usuario: admin</p>
-          <p>Pass: 1234</p>
+          <div className="mt-3">
+            <h2 className="mb-4">Registro de Usuario</h2>
+            <button onClick={handleSignup} className="btn btn-primary">
+              Registrarse
+            </button>
+          </div>
         </div>
       </div>
     </div>

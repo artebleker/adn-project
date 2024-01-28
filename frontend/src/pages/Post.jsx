@@ -1,52 +1,69 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import Layout from "../components/layout/Layout";
-
-const dataTest = {
-  id: 1,
-  titulo: "Titulo 1",
-  descripcion: "Descripcion",
-  imagen:
-    "https://cloudfront-us-east-1.images.arcpublishing.com/copesa/EKX6EPEW35BDPGRE7GKHMRY6K4.png",
-  comentarios: [{ contenido: "Comentario 1" }, { contenido: "Comentario 2" }],
-};
-
+import Layout from "../components/layout/Layout.jsx";
+import EditPost from "../components/EditPost.jsx";
 const Post = () => {
-  const token = localStorage.getItem("login");
   const [post, setPost] = useState({});
-  const [comment, setComment] = useState("");
-
+  const [postComments, setPostComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [isAuthor, setIsAuthor] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const { id } = useParams();
-  const fetchPost = async () => {
+
+  const fetchComments = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/publicaciones/${id}`);
+      const response = await fetch(
+        `http://localhost:5000/comentarios/publicacion/${id}`
+      );
       if (response.ok) {
         const data = await response.json();
-        setPost(data);
+        setPostComments(data.reverse());
       } else {
         console.error("Error al obtener datos desde la base de datos");
       }
     } catch (error) {
-      setPost(dataTest);
+      console.error("Error en la solicitud:", error);
+    }
+  };
+
+  const fetchPost = async () => {
+    const author = localStorage.getItem("author");
+    try {
+      const response = await fetch(`http://localhost:5000/publicaciones/${id}`);
+      if (response.ok) {
+        const data = await response.json();
+
+        setPost(data);
+        setIsAuthor(data.author === author);
+        fetchComments();
+        setLoading(false);
+      } else {
+        console.error("Error al obtener datos desde la base de datos");
+      }
+    } catch (error) {
       console.error("Error en la solicitud:", error);
     }
   };
 
   const handleSubmit = async (e) => {
+    const author = localStorage.getItem("author");
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5000/publicaciones", {
+      const response = await fetch(`http://localhost:5000/comentarios/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ comentario: comment }),
+        body: JSON.stringify({ text: newComment, author: author, post: id }),
       });
 
       if (response.ok) {
         const responseData = await response.json();
         console.log("Respuesta del servidor:", responseData);
-        setComment("");
+        setNewComment("");
+
+        fetchComments();
       } else {
         console.error("Error al enviar el comentario al servidor");
       }
@@ -55,56 +72,86 @@ const Post = () => {
     }
   };
 
+  const handleEditClick = () => {
+    setShowEditModal((prev) => !prev);
+  };
+
   useEffect(() => {
-    if (token === "TRUE") {
-      fetchPost();
-    } else {
-      localStorage.clear();
-      window.location.href = "/login";
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return (window.location.href = "/login");
     }
+    fetchPost();
   }, []);
 
   return (
     <Layout>
-      <div className="m-5">
-        {post.imagen ? (
-          <>
-            <img src={post.imagen} className="card-img-top" alt={post.titulo} />
-            <div className="card-body">
-              <h5 className="card-title">{post.titulo}</h5>
-              <p className="card-text">{post.descripcion}</p>
+      <div className="container mt-5">
+        {loading ? (
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        ) : post.image ? (
+          <div className="card shadow-sm rounded">
+            <img
+              src={post.image}
+              className="card-img-top img-fluid rounded-top mx-auto"
+              alt={post.title}
+              style={{ maxWidth: "75%" }}
+            />
+            <div className="card-body p-3">
+              <h5 className="card-title">{post.title}</h5>
+              <p className="card-text">{post.description}</p>
               <ul className="list-group">
-                {post.comentarios.map((comentario, index) => (
-                  <li key={index} className="list-group-item">
-                    {comentario.contenido}
+                {isAuthor && (
+                  <button onClick={handleEditClick} className="btn btn-warning">
+                    Editar este Post
+                  </button>
+                )}
+                {showEditModal && (
+                  <EditPost
+                    post={post && post}
+                    handleClose={() => setShowEditModal((prev) => !prev)}
+                  />
+                )}
+                {postComments.map((comentario, index) => (
+                  <li key={index} className="list-group-item shadow-sm rounded">
+                    <h6 className="text-muted" style={{ fontSize: "0.8rem" }}>
+                      {comentario.author} -{" "}
+                      {new Date(comentario.createdAt).toLocaleDateString()}
+                    </h6>
+                    <strong style={{ fontSize: "1rem" }}>
+                      {comentario.text}
+                    </strong>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="container mt-4">
-              <form onSubmit={handleSubmit}>
-                <div className="mb-3">
+            <div className="card-footer bg-transparent">
+              <form onSubmit={handleSubmit} className="mb-3">
+                <div className="input-group">
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control rounded"
                     id="commentInput"
                     placeholder="Agregar Comentario:"
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
                     required
                   />
+                  <button type="submit" className="btn btn-primary rounded">
+                    Enviar Comentario
+                  </button>
                 </div>
-                <button type="submit" className="btn btn-primary">
-                  Enviar Comentario
-                </button>
               </form>
             </div>
-          </>
+          </div>
         ) : (
-          <p>Loading . . . </p>
+          <p>No se encontró el post.</p>
         )}
       </div>
     </Layout>
   );
 };
+
 export default Post;

@@ -4,6 +4,7 @@ import Login from "./pages/Login.jsx";
 import Post from "./pages/Post.jsx";
 import Error from "./pages/Error.jsx";
 import Favorites from "./pages/Favorites.jsx";
+import "./app.css";
 
 const App = () => {
   return (

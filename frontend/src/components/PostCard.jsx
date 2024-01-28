@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
 
 const Card = ({ post }) => {
-  const { titulo, _id, imagen } = post;
+  const { title, _id, image } = post;
 
   return (
     <div className="card">
-      <img src={imagen} className="card-img-top" alt={titulo} />
+      <img src={image} className="card-img-top" alt={title} />
       <div className="card-body">
-        <h5 className="card-title">{titulo}</h5>
+        <h5 className="card-title">{title}</h5>
         <Link to={`/post/${_id}`} className="btn btn-primary mt-3">
           Ver Detalles
         </Link>

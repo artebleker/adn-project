@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import Layout from "../components/layout/Layout";
-import PostCardContainer from "../components/PostCardContainer";
+import Layout from "../components/layout/Layout.jsx";
+import PostCardContainer from "../components/PostCardContainer.jsx";
+import NewPost from "../components/NewPost.jsx";
 
 const Home = () => {
-  const token = localStorage.getItem("login");
   const [allPost, setAllPost] = useState([]);
   const fetchData = async () => {
     try {
@@ -11,8 +11,8 @@ const Home = () => {
       // const response = await fetch("127.0.0.1:5000/publicaciones");
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
-        setAllPost(data);
+        // console.log(data);
+        setAllPost(data.reverse());
       } else {
         console.error("Error al obtener datos desde la base de datos");
       }
@@ -22,21 +22,25 @@ const Home = () => {
   };
 
   useEffect(() => {
-    if (token === "TRUE") {
-      fetchData();
-    } else {
-      localStorage.clear();
-      window.location.href = "/login";
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return (window.location.href = "/login");
     }
+    fetchData();
   }, []);
 
   return (
     <Layout>
       <div>
-        {allPost.length > 0 ? (
-          <PostCardContainer allPost={allPost} />
+        {allPost ? (
+          <>
+            <NewPost />
+            <PostCardContainer allPost={allPost} />
+          </>
         ) : (
-          <p>Loading . . .</p>
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
         )}
       </div>
     </Layout>

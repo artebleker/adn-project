@@ -1,7 +1,9 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-import router from "../routes/app.routes.js";
+import authRouter from "../routes/auth.routes.js";
+import postRouter from "../routes/post.routes.js";
+import commentRouter from "../routes/comment.routes.js";
 
 const app = express();
 
@@ -19,5 +21,7 @@ db.once("open", async () => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-app.use("/", router);
+app.use("/auth", authRouter);
+app.use("/", postRouter);
+app.use("/", commentRouter);
 export default app;

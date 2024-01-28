@@ -61,8 +61,11 @@ export const updatePost = async (req, res) => {
 export const deletePost = async (req, res) => {
   try {
     const deletedPost = await Post.findByIdAndDelete(req.params.id);
-    handleNotFound(res, deletedPost);
-    res.json({ mensaje: "Publicación eliminada exitosamente" });
+    if (!deletedPost) {
+      return res.status(404).json({ mensaje: "Publicación no encontrada" });
+    }
+
+    return res.json({ mensaje: "Publicación eliminada exitosamente" });
   } catch (err) {
     handleError(res, err);
   }
