@@ -72,7 +72,7 @@ const Login = () => {
 
   return (
     <div className="container">
-      <div className="row justify-content-center mt-5">
+      <div className="row justify-content-center mt-5 text-center">
         <div className="col-md-6">
           <h1>ADN - FinalProject</h1>
           <form onSubmit={handleSubmit}>
@@ -110,7 +110,7 @@ const Login = () => {
           </form>
           <div className="mt-3">
             <h2 className="mb-4">Registro de Usuario</h2>
-            <button onClick={handleSignup} className="btn btn-primary">
+            <button onClick={handleSignup} className="btn btn-success btn-lg">
               Registrarse
             </button>
           </div>

@@ -1,6 +1,6 @@
-* {
-  margin: 0;
-  padding: 0;
-  color: black;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
+.comment-section {
+  background-color: rgba(12, 122, 155, 0.877);
+  border-radius: 12px !important;
+  margin-top: 10px;
+  color: white;
 }

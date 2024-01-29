@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Layout from "../components/layout/Layout.jsx";
 import EditPost from "../components/EditPost.jsx";
+import CommentsPost from "../components/CommentsPost.jsx";
 const Post = () => {
   const [post, setPost] = useState({});
   const [postComments, setPostComments] = useState([]);
@@ -97,35 +98,27 @@ const Post = () => {
               src={post.image}
               className="card-img-top img-fluid rounded-top mx-auto"
               alt={post.title}
-              style={{ maxWidth: "75%" }}
+              style={{ maxWidth: "75%", padding: "25px" }}
             />
             <div className="card-body p-3">
-              <h5 className="card-title">{post.title}</h5>
+              <h3 className="card-title">{post.title.toUpperCase()}</h3>
               <p className="card-text">{post.description}</p>
-              <ul className="list-group">
-                {isAuthor && (
-                  <button onClick={handleEditClick} className="btn btn-warning">
-                    Editar este Post
-                  </button>
-                )}
-                {showEditModal && (
-                  <EditPost
-                    post={post && post}
-                    handleClose={() => setShowEditModal((prev) => !prev)}
-                  />
-                )}
-                {postComments.map((comentario, index) => (
-                  <li key={index} className="list-group-item shadow-sm rounded">
-                    <h6 className="text-muted" style={{ fontSize: "0.8rem" }}>
-                      {comentario.author} -{" "}
-                      {new Date(comentario.createdAt).toLocaleDateString()}
-                    </h6>
-                    <strong style={{ fontSize: "1rem" }}>
-                      {comentario.text}
-                    </strong>
-                  </li>
-                ))}
-              </ul>
+              {isAuthor && (
+                <button
+                  onClick={handleEditClick}
+                  className="btn btn-danger btn-lg"
+                >
+                  Editar este Post
+                </button>
+              )}
+              {showEditModal && (
+                <EditPost
+                  post={post && post}
+                  handleClose={() => setShowEditModal((prev) => !prev)}
+                />
+              )}
+
+              <CommentsPost postComments={postComments} isAuthor={isAuthor} />
             </div>
             <div className="card-footer bg-transparent">
               <form onSubmit={handleSubmit} className="mb-3">

@@ -52,13 +52,13 @@ const NewPost = () => {
 
   return (
     <div>
-      <button className="btn btn-primary" onClick={handleShowModal}>
+      <button className="btn btn-warning btn-lg m-3" onClick={handleShowModal}>
         Nuevo post
       </button>
 
       <div
         className={`modal ${showModal ? "show" : ""}`}
-        style={{ display: showModal ? "block" : "none" }}
+        style={{ display: showModal ? "block" : "none", zIndex: 9999 }}
       >
         <div className="modal-dialog">
           <div className="modal-content">
